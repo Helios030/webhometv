@@ -174,7 +174,6 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     @Override
     protected void initEvent() {
-        mBinding.webSettings.setOnClickListener(view -> openSetting());
         mBinding.title.setListener(this);
         mBinding.toolbar.addOnLayoutChangeListener((v, left, top, right, bottom, oldLeft, oldTop, oldRight, oldBottom) -> {
             syncNativeContentInset();
@@ -412,13 +411,11 @@ public class HomeActivity extends BaseActivity implements CustomTitleView.Listen
 
     private void showWebOverlay() {
         mBinding.webOverlay.setVisibility(View.VISIBLE);
-        mBinding.webSettings.setVisibility(View.VISIBLE);
         syncWebOverlayLayout();
     }
 
     private void hideWebOverlay() {
         mBinding.webOverlay.setVisibility(View.GONE);
-        mBinding.webSettings.setVisibility(View.GONE);
     }
 
     private void setTypes(Result result) {
