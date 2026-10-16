@@ -1540,4 +1540,8 @@
     <string name="home_panel_drive_config">网盘登录 / Cookie</string>
     <string name="home_panel_drive_missing">当前接口源没有网盘配置中心。</string>
     <string name="home_panel_drive_empty">网盘配置中心没有返回配置分类。</string>
+    <string name="config_latency_pending">检测中…</string>
+    <string name="config_latency_unreachable">不可达</string>
+    <string name="config_latency_local">本地</string>
+    <string name="config_latency_ms">%1$d ms</string>
 </resources>

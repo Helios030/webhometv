@@ -1,6 +1,7 @@
 package com.fongmi.android.tv.ui.dialog;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.view.Gravity;
@@ -93,6 +94,7 @@ public class HistoryDialog extends BaseAlertDialog implements ConfigAdapter.OnCl
         if (isFull()) binding.recycler.setMaxHeight(ResUtil.dp2px(264));
         binding.recycler.addItemDecoration(new SpaceItemDecoration(1, 8));
         binding.recycler.setAdapter(adapter.readOnly(readOnly).addAll(type, getConfig()));
+        if (type == 0 && !readOnly) adapter.checkLatency();
     }
 
     private Config getConfig() {
@@ -113,6 +115,18 @@ public class HistoryDialog extends BaseAlertDialog implements ConfigAdapter.OnCl
     @Override
     public void onDeleteClick(Config item) {
         if (adapter.remove(item) == 0) dismiss();
+    }
+
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        if (adapter != null) adapter.cancelLatencyCheck();
+        super.onDismiss(dialog);
+    }
+
+    @Override
+    public void onDestroyView() {
+        if (adapter != null) adapter.cancelLatencyCheck();
+        super.onDestroyView();
     }
 
     @Override

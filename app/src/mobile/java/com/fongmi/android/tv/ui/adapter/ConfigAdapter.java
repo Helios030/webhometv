@@ -9,18 +9,26 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.fongmi.android.tv.bean.Config;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.databinding.AdapterConfigBinding;
+import com.fongmi.android.tv.utils.ConfigLatencyProbe;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder> {
 
     private final OnClickListener listener;
     private List<Config> mItems;
     private boolean readOnly;
+    private ConfigLatencyProbe latencyProbe;
+    private Map<String, Long> latencies;
 
     public ConfigAdapter(OnClickListener listener) {
         this.listener = listener;
+        setHasStableIds(true);
     }
 
     public interface OnClickListener {
@@ -55,6 +63,27 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
         return getItemCount();
     }
 
+    public void checkLatency() {
+        cancelLatencyCheck();
+        latencies = Collections.emptyMap();
+        latencyProbe = new ConfigLatencyProbe();
+        notifyDataSetChanged();
+        latencyProbe.start(new ArrayList<>(mItems), results -> {
+            latencies = results;
+            ConfigLatencyProbe.sort(mItems, results);
+            notifyDataSetChanged();
+        });
+    }
+
+    public void cancelLatencyCheck() {
+        if (latencyProbe != null) latencyProbe.cancel();
+    }
+
+    @Override
+    public long getItemId(int position) {
+        return mItems.get(position).getId();
+    }
+
     @Override
     public int getItemCount() {
         return mItems.size();
@@ -70,6 +99,14 @@ public class ConfigAdapter extends RecyclerView.Adapter<ConfigAdapter.ViewHolder
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Config item = mItems.get(position);
         holder.binding.text.setText(item.getDesc());
+        if (latencies != null) {
+            Long cost = latencies.get(item.getUrl());
+            String value = cost == null ? holder.itemView.getContext().getString(R.string.config_latency_pending)
+                    : cost == ConfigLatencyProbe.LOCAL ? holder.itemView.getContext().getString(R.string.config_latency_local)
+                    : cost == ConfigLatencyProbe.UNREACHABLE ? holder.itemView.getContext().getString(R.string.config_latency_unreachable)
+                    : holder.itemView.getContext().getString(R.string.config_latency_ms, cost);
+            holder.binding.text.setText(item.getDesc() + " · " + value);
+        }
         holder.binding.text.setOnClickListener(v -> listener.onTextClick(item));
         holder.binding.delete.setVisibility(readOnly ? View.GONE : View.VISIBLE);
         holder.binding.delete.setOnClickListener(v -> listener.onDeleteClick(item));

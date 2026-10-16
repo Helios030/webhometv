@@ -1548,4 +1548,8 @@
     <string name="home_panel_drive_config">Drive login / Cookie</string>
     <string name="home_panel_drive_missing">The current source has no drive configuration center.</string>
     <string name="home_panel_drive_empty">The drive configuration center returned no categories.</string>
+    <string name="config_latency_pending">Checking…</string>
+    <string name="config_latency_unreachable">Unreachable</string>
+    <string name="config_latency_local">Local</string>
+    <string name="config_latency_ms">%1$d ms</string>
 </resources>
