@@ -42,6 +42,7 @@ import com.fongmi.android.tv.impl.SiteListener;
 import com.fongmi.android.tv.model.SiteViewModel;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.ui.activity.HomeActivity;
+import com.fongmi.android.tv.ui.activity.FolderActivity;
 import com.fongmi.android.tv.ui.activity.HistoryActivity;
 import com.fongmi.android.tv.ui.activity.KeepActivity;
 import com.fongmi.android.tv.ui.activity.SearchActivity;
@@ -51,6 +52,7 @@ import com.fongmi.android.tv.ui.dialog.ApkPushDialog;
 import com.fongmi.android.tv.ui.dialog.ApkPushMethodDialog;
 import com.fongmi.android.tv.ui.dialog.ApkPushUrlDialog;
 import com.fongmi.android.tv.ui.dialog.FilterDialog;
+import com.fongmi.android.tv.ui.dialog.ChoiceDialog;
 import com.fongmi.android.tv.ui.dialog.HistoryDialog;
 import com.fongmi.android.tv.ui.dialog.LinkDialog;
 import com.fongmi.android.tv.ui.dialog.OneKeySyncDialog;
@@ -617,6 +619,17 @@ public class VodFragment extends BaseFragment implements ConfigListener, SiteLis
     @Override
     public void openSetting() {
         if (getActivity() instanceof HomeActivity) ((HomeActivity) getActivity()).change(1);
+    }
+
+    @Override
+    public void openDriveConfig(String key, Result result) {
+        if (!isAdded()) return;
+        ChoiceDialog.showSingle(this, R.string.home_panel_drive_config,
+                result.getTypes().stream().map(Class::getTypeName).toArray(String[]::new), -1, which -> {
+                    Result selected = Result.empty();
+                    selected.setTypes(java.util.List.of(result.getTypes().get(which)));
+                    FolderActivity.start(requireActivity(), key, selected);
+                });
     }
 
     private void hideNativeContent() {

@@ -112,7 +112,6 @@ public class HomeActivity extends BaseActivity implements NavigationBarView.OnIt
 
     @Override
     protected void initEvent() {
-        mBinding.webSettings.setOnClickListener(view -> change(1));
         mBinding.navigation.findViewById(R.id.live).setOnLongClickListener(this::addShortcut);
     }
 

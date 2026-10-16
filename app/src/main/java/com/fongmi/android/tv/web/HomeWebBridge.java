@@ -6,11 +6,13 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebView;
 
 import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.R;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.api.SiteApi;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.History;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.bean.drive.DriveCheckRequest;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.service.DriveCheckService;
@@ -122,6 +124,7 @@ public class HomeWebBridge {
                 case "app.openLive" -> openLive();
                 case "app.openKeep" -> openKeep();
                 case "app.openSetting" -> openSetting();
+                case "app.openDriveConfig" -> openDriveConfig();
                 case "app.history" -> history();
                 case "pan.check" -> checkLinks(payload);
                 case "pan.play" -> playPan(payload);
@@ -319,6 +322,16 @@ public class HomeWebBridge {
 
     private String openSetting() {
         App.post(controller::openSetting);
+        return "{}";
+    }
+
+    private String openDriveConfig() throws Exception {
+        Site site = VodConfig.get().getSites().stream()
+                .filter(item -> item.getType() == 3 && "csp_Config".equalsIgnoreCase(item.getApi().trim()))
+                .findFirst().orElseThrow(() -> new IllegalStateException(activity.getString(R.string.home_panel_drive_missing)));
+        Result result = SiteApi.homeContent(site);
+        if (result.getTypes().isEmpty()) throw new IllegalStateException(activity.getString(R.string.home_panel_drive_empty));
+        App.post(() -> controller.openDriveConfig(site.getKey(), result));
         return "{}";
     }
 

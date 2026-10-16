@@ -30,6 +30,7 @@ import com.fongmi.android.tv.R;
 import com.github.catvod.crawler.SpiderDebug;
 import com.fongmi.android.tv.api.config.VodConfig;
 import com.fongmi.android.tv.bean.Site;
+import com.fongmi.android.tv.bean.Result;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.setting.Setting;
 import com.fongmi.android.tv.utils.KeyUtil;
@@ -41,6 +42,7 @@ import com.fongmi.android.tv.web.ext.WebHomeExtension;
 import com.fongmi.android.tv.web.ext.WebHomeExtensionRegistry;
 import com.google.common.net.HttpHeaders;
 import com.google.gson.JsonObject;
+import com.github.catvod.utils.Asset;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -374,6 +376,10 @@ public class HomeWebController {
         listener.openSetting();
     }
 
+    public void openDriveConfig(String key, Result result) {
+        listener.openDriveConfig(key, result);
+    }
+
     public void onResume() {
         paused = false;
         synchronized (this) {
@@ -646,6 +652,13 @@ public class HomeWebController {
         injectViewport();
         webView.evaluateJavascript(getSdk(), value -> {
             sdkReady = true;
+            Uri page = Uri.parse(webView.getUrl() == null ? "" : webView.getUrl());
+            if ("https".equals(page.getScheme()) && "vvee.ccwu.cc".equals(page.getHost())) {
+                JsonObject labels = new JsonObject();
+                labels.addProperty("settings", activity.getString(R.string.home_panel_app_settings));
+                labels.addProperty("drive", activity.getString(R.string.home_panel_drive_config));
+                webView.evaluateJavascript("window.__fmAppPanelLabels=" + labels + ";" + Asset.read("js/eclipse-app-panel.js"), null);
+            }
             injectExtensions(WebHomeExtension.RUN_AT_END);
             webView.postDelayed(() -> injectExtensions(WebHomeExtension.RUN_AT_IDLE), 600);
         });
@@ -834,6 +847,7 @@ public class HomeWebController {
                       openLive:()=>invoke('app.openLive',{}),
                       openKeep:()=>invoke('app.openKeep',{}),
                       openSetting:()=>invoke('app.openSetting',{}),
+                      openDriveConfig:()=>invoke('app.openDriveConfig',{}),
                       history:()=>invoke('app.history',{})
                     },
                     pan,
@@ -861,6 +875,7 @@ public class HomeWebController {
                     openLive:window.fongmi.app.openLive,
                     openKeep:window.fongmi.app.openKeep,
                     openSetting:window.fongmi.app.openSetting,
+                    openDriveConfig:window.fongmi.app.openDriveConfig,
                     history:window.fongmi.app.history,
                     pan,
                     check:window.fongmi.pan.check,
@@ -987,6 +1002,9 @@ public class HomeWebController {
         }
 
         default void openSetting() {
+        }
+
+        default void openDriveConfig(String key, Result result) {
         }
 
         default void onWebConsole(String line) {
