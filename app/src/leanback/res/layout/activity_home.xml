@@ -102,4 +102,18 @@
             tools:text="09:20:00" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/webSettings"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:background="@drawable/selector_web_home_settings"
+        android:contentDescription="@string/home_setting"
+        android:elevation="8dp"
+        android:focusable="true"
+        android:padding="12dp"
+        android:src="@drawable/ic_remote_settings"
+        android:visibility="gone" />
+
 </FrameLayout>
