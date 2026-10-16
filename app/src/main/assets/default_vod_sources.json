@@ -1,0 +1,7 @@
+[
+  {"name": "潇洒（直连）", "url": "https://qist.wyfc.qzz.io/xiaosa/api.json"},
+  {"name": "俊于（直连）", "url": "http://home.jundie.top:81/top98.json"},
+  {"name": "饭太硬（直连镜像）", "url": "https://qist.wyfc.qzz.io/fty.json"},
+  {"name": "qist（直连）", "url": "https://qist.wyfc.qzz.io/jsm.json"},
+  {"name": "qist（GitHub 加速备用）", "url": "https://gh-proxy.com/https://raw.githubusercontent.com/qist/tvbox/master/jsm.json"}
+]

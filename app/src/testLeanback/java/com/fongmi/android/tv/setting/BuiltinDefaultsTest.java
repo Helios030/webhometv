@@ -9,7 +9,9 @@ import androidx.room.Room;
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.bean.Config;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.Init;
+import com.github.catvod.utils.Prefers;
 
 import org.junit.After;
 import org.junit.Before;
@@ -38,6 +40,7 @@ public class BuiltinDefaultsTest {
 
     @Before
     public void setUp() throws Exception {
+        Prefers.remove("builtin_vod_sources_v1");
         database = Room.inMemoryDatabaseBuilder(RuntimeEnvironment.getApplication(), AppDatabase.class)
                 .allowMainThreadQueries().build();
         ReflectionHelpers.setStaticField(AppDatabase.class, "instance", database);
@@ -58,14 +61,47 @@ public class BuiltinDefaultsTest {
         assertEquals("https://qist.wyfc.qzz.io/xiaosa/api.json", config.getUrl());
         assertTrue(config.getId() > 0);
         assertEquals(config.getId(), Config.vod().getId());
-        assertEquals(1, Config.getAll(0).size());
+        assertEquals(5, Config.getAll(0).size());
+        assertEquals(config.getId(), Config.vod().getId());
     }
 
     @Test
     public void existingSourceIsPreserved() {
         Config config = Config.create(0, "https://example.com/custom.json", "My source");
+        assertEquals(6, Config.getAll(0).size());
         assertEquals(config.getId(), Config.vod().getId());
         assertEquals(config.getUrl(), Config.vod().getUrl());
+    }
+
+    @Test
+    public void presetImportPreservesExistingNamesAndDoesNotDuplicateOrRestoreDeletedSources() {
+        String url = "https://qist.wyfc.qzz.io/fty.json";
+        Config existing = Config.create(0, url, "My custom name");
+        assertEquals(5, Config.getAll(0).size());
+        assertEquals(existing.getId(), Config.vod().getId());
+        assertEquals("My custom name", Config.find(url, 0).getName());
+        assertEquals(5, Config.getAll(0).size());
+        Config.delete(url, 0);
+        assertEquals(4, Config.getAll(0).size());
+    }
+
+    @Test
+    public void selectingBuiltinSourcePersistsWithoutChangingLiveOrWallpaperLists() {
+        assertTrue(Config.getAll(1).isEmpty());
+        assertTrue(Config.getAll(2).isEmpty());
+        Config.getAll(0);
+        String url = "https://qist.wyfc.qzz.io/jsm.json";
+        Config.find(url, 0).update();
+        assertEquals(url, Config.vod().getUrl());
+        assertEquals(5, Config.getAll(0).size());
+        assertEquals(url, Config.vod().getUrl());
+    }
+
+    @Test
+    public void acceleratedSourceKeepsRelativeSpiderUrlInsideChosenProxy() {
+        String source = "https://gh-proxy.com/https://raw.githubusercontent.com/qist/tvbox/master/jsm.json";
+        assertEquals("https://gh-proxy.com/https://raw.githubusercontent.com/qist/tvbox/master/jar/spider.jar",
+                UrlUtil.resolve(source, "./jar/spider.jar"));
     }
 
     @Test

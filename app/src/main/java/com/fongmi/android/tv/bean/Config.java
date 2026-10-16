@@ -11,6 +11,7 @@ import androidx.room.PrimaryKey;
 
 import com.fongmi.android.tv.App;
 import com.fongmi.android.tv.db.AppDatabase;
+import com.github.catvod.utils.Asset;
 import com.github.catvod.utils.Prefers;
 import com.google.gson.annotations.SerializedName;
 import com.google.gson.reflect.TypeToken;
@@ -21,6 +22,8 @@ import java.util.List;
 
 @Entity(indices = @Index(value = {"url", "type"}, unique = true))
 public class Config {
+
+    private static final String BUILTIN_VOD_SOURCES = "builtin_vod_sources_v1";
 
     @PrimaryKey(autoGenerate = true)
     @SerializedName("id")
@@ -72,7 +75,21 @@ public class Config {
     }
 
     public static List<Config> getAll(int type) {
+        if (type == 0) importBuiltinVodSources();
         return AppDatabase.get().getConfigDao().findByType(type);
+    }
+
+    private static synchronized void importBuiltinVodSources() {
+        if (Prefers.getBoolean(BUILTIN_VOD_SOURCES)) return;
+        vod();
+        for (Depot source : Depot.arrayFrom(Asset.read("default_vod_sources.json"))) {
+            if (AppDatabase.get().getConfigDao().find(source.getUrl(), 0) != null) continue;
+            Config item = new Config().type(0).url(source.getUrl()).name(source.getName());
+            // Unused presets must not replace the current interface, even when its time is zero.
+            item.setTime(-1);
+            item.insert();
+        }
+        Prefers.put(BUILTIN_VOD_SOURCES, true);
     }
 
     public static List<Config> findUrls() {
