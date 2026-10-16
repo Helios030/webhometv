@@ -2,6 +2,7 @@
   "enabled": true,
   "insertIndex": 0,
   "homeKey": "webhome_eclipse",
+  "builtinHomesImported": true,
   "items": [
     {"key": "webhome_eclipse", "name": "Eclipse 影视首页", "enabled": true, "type": 3, "api": "csp_Builtin", "homePage": "https://vvee.ccwu.cc/"},
     {"key": "webhome_nostr_filter", "name": "nostr（筛选）", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://nostr.aws.dpdns.org/"},

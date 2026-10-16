@@ -49,7 +49,7 @@ public class CustomCspSetting {
     private static final String KIND_OTHER = "other";
     private static final String API_BUILTIN = "csp_Builtin";
     private static final long MAX_SUMMARY_REGISTRY_SIZE = 8L * 1024 * 1024;
-    private static final Set<String> ROOT_SKIP_FIELDS = Set.of("enabled", "insertIndex", "homeKey", "items", "sites", "lives", "proxy");
+    private static final Set<String> ROOT_SKIP_FIELDS = Set.of("enabled", "insertIndex", "homeKey", "builtinHomesImported", "items", "sites", "lives", "proxy");
     private static final List<String> ROOT_OTHER_FIELD_LIST = List.of("spider", "parses", "doh", "hosts", "headers", "rules", "ads", "flags", "wallpaper", "logo", "notice", "home", "parse", "urls", "msg");
     private static final Set<String> ROOT_OTHER_FIELDS = new HashSet<>(ROOT_OTHER_FIELD_LIST);
     private static final Set<String> ROOT_OTHER_STRING_FIELDS = Set.of("spider", "wallpaper", "logo", "notice", "home", "parse", "msg");
@@ -58,8 +58,26 @@ public class CustomCspSetting {
 
     public static Registry load() {
         File file = registryFile();
-        String text = file.exists() ? Path.read(file) : Asset.read("default_custom_csp.json");
-        return objectFrom(text);
+        if (!file.exists()) return objectFrom(Asset.read("default_custom_csp.json"));
+        Registry registry;
+        try {
+            registry = parse(Path.read(file));
+        } catch (Exception e) {
+            return new Registry();
+        }
+        if (registry.builtinHomesImported) return registry;
+        Registry defaults = objectFrom(Asset.read("default_custom_csp.json"));
+        Set<String> keys = new HashSet<>();
+        for (Item item : registry.getItems()) keys.add(item.getKey());
+        List<Item> items = new ArrayList<>(registry.getItems());
+        for (Item item : defaults.getItems()) {
+            if (!keys.add(item.getKey())) continue;
+            item.setEnabled(false);
+            items.add(item);
+        }
+        registry.setItems(items);
+        registry.builtinHomesImported = true;
+        return registry.normalize();
     }
 
     public static Registry objectFrom(String text) {
@@ -561,6 +579,8 @@ public class CustomCspSetting {
         private Integer insertIndex;
         @SerializedName("homeKey")
         private String homeKey;
+        @SerializedName("builtinHomesImported")
+        private boolean builtinHomesImported;
         @SerializedName("items")
         private List<Item> items;
 

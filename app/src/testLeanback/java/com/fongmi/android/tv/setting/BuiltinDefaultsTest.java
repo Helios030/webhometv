@@ -83,12 +83,55 @@ public class BuiltinDefaultsTest {
     }
 
     @Test
-    public void savedDisabledOrEmptyRegistryIsNotReplaced() throws Exception {
+    public void savedDisabledRegistryGetsSelectablePresetsWithoutEnablingThem() throws Exception {
         Files.writeString(registry.toPath(), "{\"enabled\":false,\"items\":[]}");
         CustomCspSetting.Registry saved = CustomCspSetting.load();
         assertFalse(saved.isEnabled());
-        assertTrue(saved.getItems().isEmpty());
-        Files.writeString(registry.toPath(), "");
+        assertEquals(17, saved.getItems().size());
+        assertEquals(0, saved.getItems().stream().filter(CustomCspSetting.Item::isEnabled).count());
+        assertTrue(saved.getHomeKey().isEmpty());
+    }
+
+    @Test
+    public void existingItemsAndHomeSurviveMigrationWithoutDuplicateKeys() throws Exception {
+        Files.writeString(registry.toPath(), """
+                {"enabled":true,"homeKey":"my_home","items":[
+                  {"key":"my_home","name":"My homepage","type":3,"api":"csp_Builtin","homePage":"https://example.com/"},
+                  {"key":"webhome_eclipse","name":"My Eclipse","enabled":false,"type":3,"api":"csp_Builtin","homePage":"https://example.com/eclipse/"}
+                ]}
+                """);
+        CustomCspSetting.Registry saved = CustomCspSetting.load();
+        assertEquals(18, saved.getItems().size());
+        assertEquals("my_home", saved.getHomeKey());
+        assertEquals(1, saved.getItems().stream().filter(CustomCspSetting.Item::isEnabled).count());
+        CustomCspSetting.Item eclipse = saved.getItems().stream().filter(item -> item.getKey().equals("webhome_eclipse")).findFirst().orElseThrow();
+        assertEquals("My Eclipse", eclipse.getName());
+        assertEquals("https://example.com/eclipse/", eclipse.getHomePage());
+        assertFalse(eclipse.isEnabled());
+        assertEquals(18, CustomCspSetting.load().getItems().size());
+    }
+
+    @Test
+    public void savedPresetSelectionAndDeletionSurviveReload() throws Exception {
+        Files.writeString(registry.toPath(), "{\"items\":[]}");
+        CustomCspSetting.Registry saved = CustomCspSetting.load();
+        CustomCspSetting.Item selected = saved.getItems().stream().filter(item -> item.getKey().equals("webhome_nostr_tv")).findFirst().orElseThrow();
+        selected.setEnabled(true);
+        saved.setHomeKey(selected.getKey());
+        saved.getItems().removeIf(item -> item.getKey().equals("webhome_pomo"));
+        Files.writeString(registry.toPath(), App.gson().toJson(saved));
+        CustomCspSetting.Registry reloaded = CustomCspSetting.load();
+        assertEquals(16, reloaded.getItems().size());
+        assertEquals("webhome_nostr_tv", reloaded.getHomeKey());
+        assertEquals(1, reloaded.sites().size());
+        assertEquals("https://nostrtv.aws.dpdns.org/", reloaded.sites().get(0).getHomePage());
+    }
+
+    @Test
+    public void explicitlySavedEmptyOrMalformedRegistryDoesNotRestoreDefaults() throws Exception {
+        Files.writeString(registry.toPath(), "{\"builtinHomesImported\":true,\"items\":[]}");
+        assertTrue(CustomCspSetting.load().getItems().isEmpty());
+        Files.writeString(registry.toPath(), "invalid JSON");
         assertTrue(CustomCspSetting.load().getItems().isEmpty());
     }
 }
