@@ -12,6 +12,7 @@ import com.fongmi.android.tv.gson.ExtAdapter;
 import com.fongmi.android.tv.server.Server;
 import com.fongmi.android.tv.utils.UrlUtil;
 import com.github.catvod.crawler.SpiderDebug;
+import com.github.catvod.utils.Asset;
 import com.github.catvod.utils.Json;
 import com.github.catvod.utils.Path;
 import com.github.catvod.utils.Util;
@@ -56,7 +57,8 @@ public class CustomCspSetting {
     private static final Pattern JS_LIVE_METHOD = Pattern.compile("(?m)(?:^|[,{;]\\s*)(?:async\\s+)?liveContent\\s*(?:[:=]\\s*(?:async\\s*)?(?:function\\s*)?|\\()", Pattern.CASE_INSENSITIVE);
 
     public static Registry load() {
-        String text = Path.read(registryFile());
+        File file = registryFile();
+        String text = file.exists() ? Path.read(file) : Asset.read("default_custom_csp.json");
         return objectFrom(text);
     }
 

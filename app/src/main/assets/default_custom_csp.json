@@ -1,0 +1,24 @@
+{
+  "enabled": true,
+  "insertIndex": 0,
+  "homeKey": "webhome_eclipse",
+  "items": [
+    {"key": "webhome_eclipse", "name": "Eclipse 影视首页", "enabled": true, "type": 3, "api": "csp_Builtin", "homePage": "https://vvee.ccwu.cc/"},
+    {"key": "webhome_nostr_filter", "name": "nostr（筛选）", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://nostr.aws.dpdns.org/"},
+    {"key": "webhome_nostr_tv", "name": "Nostr TV", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://nostrtv.aws.dpdns.org/"},
+    {"key": "webhome_nostr", "name": "nostr", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://noir-cmp.pages.dev/"},
+    {"key": "webhome_live", "name": "直播聚合", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://live-a3r.pages.dev/"},
+    {"key": "webhome_wo", "name": "玩偶聚合", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://wo.vivas.cc.cd"},
+    {"key": "webhome_pomo", "name": "Pomo", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://pomo.920410.xyz/"},
+    {"key": "webhome_cyber", "name": "赛博", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://cyber.920410.xyz/"},
+    {"key": "webhome_lumora", "name": "LUMORA", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://pl-d8z.pages.dev/"},
+    {"key": "webhome_qq_music", "name": "QQ音乐", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://q-16a.pages.dev/"},
+    {"key": "webhome_apple_music", "name": "Apple Music", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://am-4u2.pages.dev/"},
+    {"key": "webhome_audiobook", "name": "听书", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://ts-agk.pages.dev/"},
+    {"key": "webhome_comic", "name": "漫画", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://hk-bbo.pages.dev/"},
+    {"key": "webhome_av", "name": "AV", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://av-9du.pages.dev/"},
+    {"key": "webhome_bili", "name": "B 站", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://bili-1k4.pages.dev/"},
+    {"key": "webhome_youtube", "name": "油管", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://yt-cas.pages.dev/"},
+    {"key": "webhome_emby", "name": "Emby", "enabled": false, "type": 3, "api": "csp_Builtin", "homePage": "https://emby-7ks.pages.dev/"}
+  ]
+}

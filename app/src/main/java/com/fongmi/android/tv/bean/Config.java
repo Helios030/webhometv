@@ -89,7 +89,7 @@ public class Config {
 
     public static Config vod() {
         Config item = AppDatabase.get().getConfigDao().findOne(0);
-        return item == null ? create(0) : item;
+        return item == null ? create(0, "https://qist.wyfc.qzz.io/xiaosa/api.json", "小撒影视源") : item;
     }
 
     public static Config live() {
