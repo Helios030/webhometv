@@ -21,4 +21,19 @@
         app:labelVisibilityMode="unlabeled"
         app:menu="@menu/menu_nav" />
 
+    <androidx.appcompat.widget.AppCompatImageButton
+        android:id="@+id/webSettings"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_margin="16dp"
+        android:background="@drawable/selector_web_home_settings"
+        android:contentDescription="@string/nav_setting"
+        android:elevation="8dp"
+        android:focusable="true"
+        android:padding="12dp"
+        android:src="@drawable/ic_remote_settings"
+        android:visibility="gone" />
+
 </RelativeLayout>
