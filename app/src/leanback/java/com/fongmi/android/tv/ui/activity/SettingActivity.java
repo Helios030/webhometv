@@ -9,6 +9,10 @@ import android.view.View;
 import androidx.viewbinding.ViewBinding;
 
 import com.fongmi.android.tv.R;
+import com.fongmi.android.tv.App;
+import com.fongmi.android.tv.api.SiteApi;
+import com.fongmi.android.tv.bean.Result;
+import com.fongmi.android.tv.utils.Task;
 import com.fongmi.android.tv.Updater;
 import com.fongmi.android.tv.api.config.LiveConfig;
 import com.fongmi.android.tv.api.config.VodConfig;
@@ -108,6 +112,7 @@ public class SettingActivity extends BaseActivity implements ConfigListener, Sit
     @Override
     protected void initEvent() {
         mBinding.vod.setOnClickListener(this::onVod);
+        mBinding.driveLogin.setOnClickListener(this::onDriveLogin);
         mBinding.doh.setOnClickListener(this::setDoh);
         mBinding.live.setOnClickListener(this::onLive);
         mBinding.wall.setOnClickListener(this::onWall);
@@ -192,6 +197,30 @@ public class SettingActivity extends BaseActivity implements ConfigListener, Sit
 
     private void onVod(View view) {
         ConfigDialog.create().vod().show(this);
+    }
+
+    private void onDriveLogin(View view) {
+        if (!view.isEnabled()) return;
+        view.setEnabled(false);
+        Task.execute(() -> {
+            try {
+                Site site = VodConfig.get().getSites().stream()
+                        .filter(item -> item.getType() == 3 && "csp_Config".equalsIgnoreCase(item.getApi().trim()))
+                        .findFirst().orElseThrow(() -> new IllegalStateException(view.getContext().getString(R.string.home_panel_drive_missing)));
+                Result result = SiteApi.homeContent(site);
+                if (result.getTypes().isEmpty()) throw new IllegalStateException(view.getContext().getString(R.string.home_panel_drive_empty));
+                App.post(() -> {
+                    view.setEnabled(true);
+                    if (!view.isAttachedToWindow() || isFinishing() || isDestroyed()) return;
+                    VodActivity.start(this, site.getKey(), result);
+                });
+            } catch (Exception error) {
+                App.post(() -> {
+                    view.setEnabled(true);
+                    if (view.isAttachedToWindow()) Notify.show(error.getMessage());
+                });
+            }
+        });
     }
 
     private void onLive(View view) {
